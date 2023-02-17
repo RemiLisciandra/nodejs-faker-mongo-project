@@ -1,14 +1,20 @@
 // Importation de la librairie faker et mongodb
 const {faker} = require("@faker-js/faker");
 const {MongoClient} = require("mongodb");
+const express = require('express');
 
 // Configuration base de données
 const url = 'mongodb://localhost:27017';
 const dbName = 'tweeter';
 const client = new MongoClient(url);
 
-// Utilisateur qui tweet
-const user = {
+let users = [];
+let tweets = [];
+let retweets = [];
+let comments = [];
+let retweetUsers = [];
+
+users[0] = {
     firstName: faker.name.firstName(),
     lastName: faker.name.lastName(),
     get fullName() {
@@ -17,8 +23,7 @@ const user = {
     email: faker.internet.email()
 }
 
-// Utilisateur qui retweet
-const retweetUser = {
+retweetUsers[0] = {
     firstName: faker.name.firstName(),
     lastName: faker.name.lastName(),
     get fullName() {
@@ -27,53 +32,51 @@ const retweetUser = {
     email: faker.internet.email()
 }
 
-// Le tweet
-const tweet = {
+tweets[0] = {
     content: faker.lorem.sentence(),
-    author: user.name,
+    author: users[0].fullName,
     date: new Date()
 }
 
-// Le commentaire du tweet
-const comment = {
+comments[0] = {
     content: faker.lorem.sentence(),
-    author: user.name,
+    author: retweetUsers[0].fullName,
     date: new Date()
 }
 
-// Le retweet
-const retweet = {
-    author: retweetUser.name,
+retweets[0] = {
+    author: retweetUsers[0].fullName,
     date: new Date(),
     // Le contenu supplémentaire ajoutable par l'utilisateur qui retweet, c'est facultatif donc c'est possiblement null
-    contentRetweet: null
+    contentRetweet: faker.lorem.sentence()
 }
 
-// Le contenu supplémentaire de l'utilisateur qui retweet
-const userContentRetweet = faker.lorem.sentence();
+const database = client.db(dbName);
 
-// Si le contenu supplémentaire de l'utilisateur qui retweet n'est pas vide
-if (userContentRetweet) {
-    retweet.contentRetweet = null
-}
-
-// Connexion à la base de données Mongo
 async function run() {
     try {
-        const database = client.db(dbName);
-        const users = database.collection('users');
-        const tweets = database.collection('tweets');
-
-        // Insertion utilisateur
-        await users.insertOne(user, function (error, result) {
+        await database.collection('users').insertOne(users[0], function (error) {
             if (error) {
                 console.log(error);
-                return
             }
-            console.log(`Utilisateur inséré : ${user.fullName}`);
+        })
 
-            // Récupération de l'id de l'utilsateur
-            const userId = result.insertId();
+        await database.collection('tweets').insertOne(tweets[0], function (error) {
+            if (error) {
+                console.log(error);
+            }
+        })
+
+        await database.collection('retweets').insertOne(retweets[0], function (error) {
+            if (error) {
+                console.log(error);
+            }
+        })
+
+        await database.collection('comments').insertOne(retweets[0], function (error) {
+            if (error) {
+                console.log(error);
+            }
         })
     } finally {
         // Ensures that the client will close when you finish/error
