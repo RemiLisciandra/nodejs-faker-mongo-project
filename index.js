@@ -36,7 +36,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 exports.__esModule = true;
-// Importation de la librairie faker et mongodb
+// Importation de la librairie faker, mongodb et express
 var faker_1 = require("@faker-js/faker");
 var mongodb_1 = require("mongodb");
 // Configuration base de données
@@ -48,33 +48,35 @@ var tweets = [];
 var retweets = [];
 var comments = [];
 var retweetUsers = [];
-users[0] = {
-    firstName: faker_1.faker.name.firstName(),
-    lastName: faker_1.faker.name.lastName(),
-    username: faker_1.faker.internet.userName(),
-    email: faker_1.faker.internet.email()
-};
-retweetUsers[0] = {
-    firstName: faker_1.faker.name.firstName(),
-    lastName: faker_1.faker.name.lastName(),
-    username: faker_1.faker.internet.userName(),
-    email: faker_1.faker.internet.email()
-};
-tweets[0] = {
-    content: faker_1.faker.lorem.sentence(),
-    author: users[0].username,
-    date: new Date()
-};
-comments[0] = {
-    content: faker_1.faker.lorem.sentence(),
-    author: retweetUsers[0].username,
-    date: new Date()
-};
-retweets[0] = {
-    author: retweetUsers[0].username,
-    date: new Date(),
-    contentRetweet: faker_1.faker.lorem.sentence()
-};
+for (var i = 0; i < 200; i++) {
+    users[i] = {
+        firstName: faker_1.faker.name.firstName(),
+        lastName: faker_1.faker.name.lastName(),
+        username: faker_1.faker.internet.userName(),
+        email: faker_1.faker.internet.email()
+    };
+    tweets[i] = {
+        content: faker_1.faker.lorem.sentence(),
+        author: users[i].username,
+        date: new Date()
+    };
+    retweetUsers[i] = {
+        firstName: faker_1.faker.name.firstName(),
+        lastName: faker_1.faker.name.lastName(),
+        username: faker_1.faker.internet.userName(),
+        email: faker_1.faker.internet.email()
+    };
+    comments[i] = {
+        content: faker_1.faker.lorem.sentence(),
+        author: retweetUsers[i].username,
+        date: new Date()
+    };
+    retweets[i] = {
+        author: retweetUsers[i].username,
+        date: new Date(),
+        contentRetweet: faker_1.faker.lorem.sentence()
+    };
+}
 var database = client.db(dbName);
 function run() {
     return __awaiter(this, void 0, void 0, function () {
@@ -82,16 +84,16 @@ function run() {
             switch (_a.label) {
                 case 0:
                     _a.trys.push([0, , 5, 7]);
-                    return [4 /*yield*/, database.collection('users').insertOne(users[0])];
+                    return [4 /*yield*/, database.collection('users').insertMany(users)];
                 case 1:
                     _a.sent();
-                    return [4 /*yield*/, database.collection('tweets').insertOne(tweets[0])];
+                    return [4 /*yield*/, database.collection('tweets').insertMany(tweets)];
                 case 2:
                     _a.sent();
-                    return [4 /*yield*/, database.collection('retweets').insertOne(retweets[0])];
+                    return [4 /*yield*/, database.collection('retweets').insertMany(retweets)];
                 case 3:
                     _a.sent();
-                    return [4 /*yield*/, database.collection('comments').insertOne(comments[0])];
+                    return [4 /*yield*/, database.collection('comments').insertMany(comments)];
                 case 4:
                     _a.sent();
                     return [3 /*break*/, 7];
